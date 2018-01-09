@@ -2,75 +2,119 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum State
+{
+    ACTIVE,FINISHED
+}
 public class Learner : MonoBehaviour {
 
     [SerializeField]
     Transform[] joints;
 
     [SerializeField]
-    int stateNum; // 関節の状態の数
+    float interval;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    [SerializeField]
+    private State state = State.FINISHED;
+    
 
-    public void RotateJoints(Param param)
+    public IEnumerator RotateJoints(List<Param> paramList)
     {
-        for (int i = 0; i < joints.Length; i++)
+        yield return new WaitForSeconds(0.5f);
+
+        LearnerState = State.ACTIVE;
+        for (;LearnerState == State.ACTIVE;)
         {
-            this.joints[i].localEulerAngles = param.angles[i];
+            foreach (Param param in paramList)
+            {
+                if (LearnerState != State.ACTIVE)
+                {
+                    yield break;
+                }
+                for (int i = 0; i < joints.Length; i++)
+                {
+                    StartCoroutine(this.Rotate(joints[i], param.angles[i]));
+                }
+                yield return new WaitForSeconds(interval + 0.2f);
+            }
         }
     }
 
+    IEnumerator Rotate(Transform target,Vector3 destAngle)
+    {
+        Vector3 startAngle = target.localEulerAngles;
+        float startTime = Time.time;
+        for (;Time.time - startTime < this.interval;)
+        {
+            if (LearnerState == State.FINISHED)
+                yield break;
+
+            target.localEulerAngles =
+                Vector3.Lerp(startAngle, destAngle, (Time.time - startTime) / this.interval);
+            yield return null;
+        }
+        target.localEulerAngles = destAngle;
+    }
+
+    public void StopLearner()
+    {
+        this.state = State.FINISHED;
+    }
+    public State LearnerState
+    {
+        get { return this.state; }
+        set { this.state = value; }
+    }
+
+    public int GetJointNum
+    {
+        get { return this.joints.Length; }
+    }
+
+    [System.Serializable]
     public class Param
     {
         public Vector3[] angles;
 
         public Param() { }
-
-        /*
-        public Param(Vector3 lf, Vector3 rf, Vector3 lb, Vector3 rb)
-        {
-            this.angleLF = lf;
-            this.angleRF = rf;
-            this.angleLB = lb;
-            this.angleRB = rb;
-        }
-        public static Param CreateRandom()
+        
+        public static Param CreateRandom(int jointNum)
         {
             var param = new Param();
-            param.angleLF = GetRandomAngle();
-            param.angleRF = GetRandomAngle();
-            param.angleLB = GetRandomAngle();
-            param.angleRB = GetRandomAngle();
-            return param;
-        }
-        */
-
-        public Param(Vector3[] a)
-        {
-            this.angles = a;
-        }
-        public static Param CreateRandom()
-        {
-            var param = new Param();
+            param.angles = new Vector3[jointNum];
             for (int i = 0;i < param.angles.Length;i++)
             {
-                param.angles[i] = GetRandomAngle();
+                if (i > 3)
+                    param.angles[i] = GetRandomAngle();
+                else
+                    param.angles[i] = GetRandomAngle(true,false,true);
             }
             return param;
         }
 
-
-        public static Vector3 GetRandomAngle()
+        public static Param CreateParam(Vector3[] angle)
         {
-            return new Vector3(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360));
+            var param = new Param();
+            param.angles = angle;
+            return param;
+        }
+
+
+        public static Vector3 GetRandomAngle(bool X = true,bool Y = true,bool Z = true)
+        {
+            Vector3 angle = new Vector3(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360));
+            if (!X) angle.x = 0; if (!Y) angle.y = 0; if (!Z) angle.z = 0;
+            return angle;
+        }
+
+        public string GetString()
+        {
+            string str = string.Empty;
+            foreach(Vector3 angle in angles)
+            {
+                str += string.Format("{0},{1},{2}\n", angle.x, angle.y, angle.z);
+            }
+            return str;
         }
     }
 }
