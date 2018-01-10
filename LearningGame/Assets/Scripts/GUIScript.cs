@@ -2,35 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GUIScript : MonoBehaviour {
+public class GUIScript : MonoBehaviour
+{
+    GAController gc;
 
-	private bool isLON;
-	private bool isRON;
-	private bool isUON;
-	private bool isDON;
-	private float speed;
-	private float distance;
-	private LinkedList<string> resultList = new LinkedList<string>();
+    [SerializeField]
+    Color textColor = Color.red;
+    void Start()
+    {
+        gc = GameObject.Find("GameController").GetComponent<GAController>();
+    }
 
-	private object guard = new object();
+    void OnGUI()
+    {
+        GUI.contentColor = Color.black;
 
-	void OnGUI() {
+        GUI.Label(new Rect(50, 10, 500, 50), string.Format("Generation : {0}", gc.GetGeneration));
+        GUI.Label(new Rect(100, 30, 500, 50), string.Format("Time : {0}", gc.timer.ToString()));
 
-		string str = "";
-		lock (guard) {
-			foreach (var result in resultList) {
-				str += result + "\r\n";
-			}
-		}
-		GUI.Label (new Rect(10, 110, 500, 500), str);
-	}
+        GUI.contentColor = textColor;
+        DisplayBestGenes(new Rect(Screen.width - 120, 0, 500, 500));
+    }
 
-	public void setResult(string str) {
-		lock (guard) {
-			resultList.AddFirst (str);
-			if (resultList.Count > 30) {
-				resultList.RemoveLast ();
-			}
-		}
-	}
+    private void DisplayBestGenes (Rect initPos)
+    {
+        for(int i = 0;i < gc.GetBestGene.Count;i++)
+        {
+            var gene = gc.GetBestGene[i];
+            GUI.Label(initPos,(i + 1) + " : \n" + gene.GetString());
+            initPos.y += 60;
+        }
+    }
 }

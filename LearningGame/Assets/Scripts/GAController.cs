@@ -16,7 +16,14 @@ public class GAController : MonoBehaviour {
     private List<Learner> controller;
 
     [SerializeField]
-	List<Gene> geneList = new List<Gene>();
+    List<Gene> geneList = new List<Gene>();
+
+    [SerializeField]
+    List<Gene> bestGenes = new List<Gene>(5);
+    public List<Gene> GetBestGene
+    {
+        get { return this.bestGenes; }
+    }
 
     // 読み込むファイルと無視する文字列
     [SerializeField]
@@ -30,15 +37,15 @@ public class GAController : MonoBehaviour {
 
     [SerializeField]
     float waveTime;// 1世代あたりの時間
-    [SerializeField]
-    float timer; // 現在の時間
+    public float timer; // 現在の時間
 
 
     int childNum = 50;
-	int keepNum = 5;
-	int extinctionNum = 15;
-	float mutateRate = 0.02f;
+    int keepNum = 5;
+    int extinctionNum = 15;
+    float mutateRate = 0.02f;
     int generation = 0; // 現在の世代
+    public int GetGeneration { get { return this.generation; } }
 
     Spawner spawner;
 
@@ -77,7 +84,10 @@ public class GAController : MonoBehaviour {
             for (int i = 0; i < childNum; i++)
             {
                 if (this.controller[i].LearnerState != State.ACTIVE)
+                {
+                    this.geneList[i].generation = generation;
                     StartCoroutine(this.controller[i].RotateJoints(geneList[i].paramList));
+                }
             }
             // 動作終了時間まで待機
             for (this.timer = 0.0f;this.timer < waveTime;)
@@ -101,7 +111,8 @@ public class GAController : MonoBehaviour {
 				else return 0;
 			});
 
-			float totalPoint = 0.0f;
+
+            float totalPoint = 0.0f;
 			float minPoint = geneList[geneList.Count - extinctionNum - 1].point;
 			foreach (var i in Enumerable.Range(0, geneList.Count -extinctionNum)) {
 				totalPoint += (geneList [i].point - minPoint);
@@ -109,16 +120,18 @@ public class GAController : MonoBehaviour {
 					minPoint = geneList [i].point;
 				}
 			}
-
+            
 			foreach (var gene in geneList) {
 				gene.rate = Mathf.Max((gene.point - minPoint) / totalPoint, 0);
             }
+            // bestgeneを更新
+            this.UpdateBestGene(geneList[0]);
             /*
 			foreach (var gene in geneList) {
 				Debug.Log (string.Format ("{0}/{1}", gene.point, gene.rate));
 			}
             */
-			Debug.Log (string.Format ("=== Gen {0} : Top {1} m ===", generation, geneList [0].point));
+            Debug.Log (string.Format ("=== Gen {0} : Top {1} m ===", generation, geneList [0].point));
 
 			generation++;
 
@@ -301,11 +314,32 @@ public class GAController : MonoBehaviour {
 		}
 	}
 
+    // 現世代の一番スコアが良い遺伝子をbestGenesに追加
+    private void UpdateBestGene(Gene best)
+    {
+        Gene g = Gene.Clone(best);
+        if (bestGenes.Count == 0)
+        {
+            bestGenes.Add(g);
+            return;
+        }
+        foreach (int i in Enumerable.Range(0, this.bestGenes.Count))
+        {
+            if (this.bestGenes[i].point < g.point)
+            {
+                if (this.bestGenes.Count > 4) this.bestGenes.RemoveAt(4);
+                this.bestGenes.Insert(i,g);
+                return;
+            }
+        }
+    }
+
     [System.Serializable]
 	public class Gene {
 		public List<Learner.Param> paramList;
 		public float rate;
 		public float point; // 評価値
+        public int generation;
 
         public Gene()
         {
@@ -322,6 +356,22 @@ public class GAController : MonoBehaviour {
         {
             paramList = param;
         }
+        public string GetString()
+        {
+            string nl = Environment.NewLine;
+            string str = string.Format("Generation : {0}Rate : {1}Point : {2}",
+                this.generation + nl,this.rate + nl,this.point + nl);
+            return str;
+        }
+        public static Gene Clone(Gene gene)
+        {
+            Gene g = new Gene(gene.paramList);
+            g.point = gene.point;
+            g.rate = gene.rate;
+            g.generation = gene.generation;
+            return g;
+        }
+
 	}
 
     public class Spawner

@@ -35,7 +35,7 @@ public class Learner : MonoBehaviour {
                 {
                     StartCoroutine(this.Rotate(joints[i], param.angles[i]));
                 }
-                yield return new WaitForSeconds(interval + 0.2f);
+                yield return new WaitForSeconds(interval + 0.1f);
             }
         }
     }
