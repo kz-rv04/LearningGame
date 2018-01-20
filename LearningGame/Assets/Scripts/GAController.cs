@@ -25,12 +25,6 @@ public class GAController : MonoBehaviour {
         get { return this.bestGenes; }
     }
 
-    // 読み込むファイルと無視する文字列
-    [SerializeField]
-    string dataPath;
-    [SerializeField]
-    List<string> ignoreItems;
-
     [SerializeField]
     int stateNum; // 関節の状態の数
     int jointNum; // 関節の数
@@ -49,8 +43,15 @@ public class GAController : MonoBehaviour {
 
     Spawner spawner;
 
-	// Use this for initialization
-	void Start () {
+
+    // 読み込むファイルと無視する文字列
+    [SerializeField]
+    string dataPath;
+    [SerializeField]
+    List<string> ignoreItems;
+
+    // Use this for initialization
+    void Start () {
         spawner = new Spawner(this.learnerObj,new Vector3(50,0,0));
         jointNum = learnerObj.GetComponent<Learner>().GetJointNum;
         foreach (var i in Enumerable.Range(0, childNum)) {

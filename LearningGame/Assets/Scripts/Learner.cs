@@ -44,13 +44,18 @@ public class Learner : MonoBehaviour {
     {
         Vector3 startAngle = target.localEulerAngles;
         float startTime = Time.time;
+
+        Quaternion start = target.localRotation;
+        Quaternion dest = Quaternion.Euler(destAngle);
         for (;Time.time - startTime < this.interval;)
         {
             if (LearnerState == State.FINISHED)
                 yield break;
-
+            /*
             target.localEulerAngles =
                 Vector3.Lerp(startAngle, destAngle, (Time.time - startTime) / this.interval);
+            */
+            target.localRotation = Quaternion.Lerp(start, dest, (Time.time - startTime) / this.interval);
             yield return null;
         }
         target.localEulerAngles = destAngle;
@@ -74,20 +79,28 @@ public class Learner : MonoBehaviour {
     [System.Serializable]
     public class Param
     {
+        private static JointRange[] jRanges = new JointRange[6]
+        {
+            // L
+            new JointRange(new RangeAttribute(-4f,0f),new RangeAttribute(166f,178f),new RangeAttribute(-50f,50f)),
+            new JointRange(new RangeAttribute(0f,0f),new RangeAttribute(-4f,0f),new RangeAttribute(0f,100f)),
+            new JointRange(new RangeAttribute(-4f,0f),new RangeAttribute(0f,0f),new RangeAttribute(-51.82f,-51.82f)),
+            // R
+            new JointRange(new RangeAttribute(0f,4f),new RangeAttribute(178f,190f),new RangeAttribute(-50f,50f)),
+            new JointRange(new RangeAttribute(0f,0f),new RangeAttribute(0f,4f),new RangeAttribute(0f,100f)),
+            new JointRange(new RangeAttribute(0f,4f),new RangeAttribute(0f,0f),new RangeAttribute(-51.82f,-51.82f)),
+        };
         public Vector3[] angles;
 
         public Param() { }
-        
+
         public static Param CreateRandom(int jointNum)
         {
             var param = new Param();
             param.angles = new Vector3[jointNum];
-            for (int i = 0;i < param.angles.Length;i++)
+            for (int i = 0; i < param.angles.Length; i++)
             {
-                if (i > 3)
-                    param.angles[i] = GetRandomAngle();
-                else
-                    param.angles[i] = GetRandomAngle(true,false,true);
+                param.angles[i] = GetRandomAngle(jRanges[i].X, jRanges[i].Y, jRanges[i].Z);
             }
             return param;
         }
@@ -100,21 +113,36 @@ public class Learner : MonoBehaviour {
         }
 
 
-        public static Vector3 GetRandomAngle(bool X = true,bool Y = true,bool Z = true)
+        public static Vector3 GetRandomAngle(bool X = true, bool Y = true, bool Z = true)
         {
             Vector3 angle = new Vector3(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360));
             if (!X) angle.x = 0; if (!Y) angle.y = 0; if (!Z) angle.z = 0;
             return angle;
         }
 
+        public static Vector3 GetRandomAngle(RangeAttribute X,RangeAttribute Y,RangeAttribute Z)
+        {
+            return new Vector3(Random.Range(X.min, X.max), Random.Range(Y.min, Y.max), Random.Range(Z.min, Z.max));
+        }
+
         public string GetString()
         {
             string str = string.Empty;
-            foreach(Vector3 angle in angles)
+            foreach (Vector3 angle in angles)
             {
                 str += string.Format("{0},{1},{2}\n", angle.x, angle.y, angle.z);
             }
             return str;
+        }
+
+        class JointRange
+        {
+            public RangeAttribute X, Y, Z;
+
+            public JointRange(RangeAttribute x, RangeAttribute y, RangeAttribute z)
+            {
+                X = x;Y = y;Z = z;
+            }
         }
     }
 }
