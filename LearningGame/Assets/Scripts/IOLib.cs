@@ -465,9 +465,9 @@ namespace KZ
             }
 
 
-            public static void LoadMap(ref List<List<int>> outData, string text, List<string> ignore)
+            public static void LoadMap(ref List<List<float>> outData, string text, List<string> ignore)
             {
-                outData = new List<List<int>>();
+                outData = new List<List<float>>();
 
                 //空白の文字列は格納しない
                 string[] lines = text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -479,13 +479,13 @@ namespace KZ
                 for (int i = 0; i < lines.Length; i++)
                 {
                     string[] cells = lines[i].Split(spliter);
-                    List<int> line = new List<int>();
+                    List<float> line = new List<float>();
                     for (int j = 0; j < cells.Length; j++)
                     {
                         // 空のセルや無視する文字列、識別子は格納しない
                         if (!String.IsNullOrEmpty(cells[j]) && !IsIgnoreCell(cells[j], ignore))
                         {
-                            line.Add((Int32.Parse(cells[j])));
+                            line.Add((float.Parse(cells[j])));
                         }
                     }
                     // 空列は飛ばす

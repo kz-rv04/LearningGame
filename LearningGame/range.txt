@@ -2,16 +2,24 @@
 
 Left:
 0:UpLeg
-X(-4,0) Y(-190,-178) Z(-50,50)
+X(-4,0) Y(-190,-178) Z(-80,10)
 1:LeftLeg
 X(0)Y(-4,0) Z(0,100)
 2:LeftFoot
-X(-4,0)Y(0)Z(-51.82)
+X(-4,0)Y(0)Z(-30)
+3:LeftArm
+X(0) Y(55,70) Z(-80,10)
+4:LeftForeArm
+X(0) Y(0) Z(-90,0)
 
 Right:
-3:UpLeg
-X(0,4) Y(178,190) Z(-50,50)
-4:RightLeg
+5:UpLeg
+X(0,4) Y(178,190) Z(-80,10)
+6:RightLeg
 X(0)Y(0,4) Z(0,100)
-5:RightFoot
-X(0,4)Y(0)Z(-51.82)
+7:RightFoot
+X(0,4)Y(0)Z(-30)
+8:RightArm
+X(0) Y(-70,-55) Z(-80,10)
+9:RightForeArm
+X(0) Y(0) Z(-90,0)

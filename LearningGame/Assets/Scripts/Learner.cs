@@ -79,16 +79,41 @@ public class Learner : MonoBehaviour {
     [System.Serializable]
     public class Param
     {
-        private static JointRange[] jRanges = new JointRange[6]
+        /*
+         * for 2legs
+        private static JointRange[] jRanges = new JointRange[10]
         {
             // L
-            new JointRange(new RangeAttribute(-4f,0f),new RangeAttribute(166f,178f),new RangeAttribute(-50f,50f)),
+            new JointRange(new RangeAttribute(-4f,0f),new RangeAttribute(166f,178f),new RangeAttribute(-80f,10f)),
             new JointRange(new RangeAttribute(0f,0f),new RangeAttribute(-4f,0f),new RangeAttribute(0f,100f)),
-            new JointRange(new RangeAttribute(-4f,0f),new RangeAttribute(0f,0f),new RangeAttribute(-51.82f,-51.82f)),
+            new JointRange(new RangeAttribute(-4f,0f),new RangeAttribute(0f,0f),new RangeAttribute(-30.0f,-30.0f)),
+            new JointRange(new RangeAttribute(0f,0f),new RangeAttribute(55f,70f),new RangeAttribute(-80.0f,10.0f)),
+            new JointRange(new RangeAttribute(0f,0f),new RangeAttribute(0f,0f),new RangeAttribute(-90.0f,0f)),
             // R
-            new JointRange(new RangeAttribute(0f,4f),new RangeAttribute(178f,190f),new RangeAttribute(-50f,50f)),
+            new JointRange(new RangeAttribute(0f,4f),new RangeAttribute(178f,190f),new RangeAttribute(-80f,10f)),
             new JointRange(new RangeAttribute(0f,0f),new RangeAttribute(0f,4f),new RangeAttribute(0f,100f)),
-            new JointRange(new RangeAttribute(0f,4f),new RangeAttribute(0f,0f),new RangeAttribute(-51.82f,-51.82f)),
+            new JointRange(new RangeAttribute(0f,4f),new RangeAttribute(0f,0f),new RangeAttribute(-30.0f,-30.0f)),
+            new JointRange(new RangeAttribute(0f,0f),new RangeAttribute(-70f,-55f),new RangeAttribute(-80.0f,10.0f)),
+            new JointRange(new RangeAttribute(0f,0f),new RangeAttribute(0f,0f),new RangeAttribute(-90.0f,0f)),
+        };
+        */
+
+
+        private static JointRange[] jRanges = new JointRange[8]
+        {
+            new JointRange(new RangeAttribute(-20f,0f),new RangeAttribute(60f,90f),new RangeAttribute(0f,360f)),
+            new JointRange(new RangeAttribute(-45f,0f),new RangeAttribute(0f,0f),new RangeAttribute(0f,30f)),
+
+            new JointRange(new RangeAttribute(0f,360f),new RangeAttribute(0f,30f),new RangeAttribute(-20.0f,0.0f)),
+            new JointRange(new RangeAttribute(-30f,0f),new RangeAttribute(0f,0f),new RangeAttribute(0f,45f)),
+
+            new JointRange(new RangeAttribute(0f,360f),new RangeAttribute(150f,180f),new RangeAttribute(0.0f,20.0f)),
+            new JointRange(new RangeAttribute(-30f,0f),new RangeAttribute(0f,0f),new RangeAttribute(0f,45f)),
+
+            new JointRange(new RangeAttribute(-20f,0f),new RangeAttribute(270f,300f),new RangeAttribute(0f,360f)),
+            new JointRange(new RangeAttribute(-45f,0f),new RangeAttribute(0f,0f),new RangeAttribute(0f,30f)),
+
+
         };
         public Vector3[] angles;
 
@@ -101,6 +126,7 @@ public class Learner : MonoBehaviour {
             for (int i = 0; i < param.angles.Length; i++)
             {
                 param.angles[i] = GetRandomAngle(jRanges[i].X, jRanges[i].Y, jRanges[i].Z);
+                //param.angles[i] = GetRandomAngle();
             }
             return param;
         }
@@ -122,7 +148,9 @@ public class Learner : MonoBehaviour {
 
         public static Vector3 GetRandomAngle(RangeAttribute X,RangeAttribute Y,RangeAttribute Z)
         {
-            return new Vector3(Random.Range(X.min, X.max), Random.Range(Y.min, Y.max), Random.Range(Z.min, Z.max));
+            Vector3 angle = new Vector3(Random.Range(X.min, X.max), Random.Range(Y.min, Y.max), Random.Range(Z.min, Z.max));
+
+            return angle;
         }
 
         public string GetString()

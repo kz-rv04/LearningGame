@@ -204,7 +204,7 @@ public class GAController : MonoBehaviour {
             string[] g = str.Split(new char[2]{ ' ',',' });
             this.generation = Int32.Parse(g[1]);
 
-            List<List<int>> data = new List<List<int>>();
+            List<List<float>> data = new List<List<float>>();
 
             CSVIO.LoadMap(ref data, sr.ReadToEnd(),this.ignoreItems);
 
@@ -226,17 +226,17 @@ public class GAController : MonoBehaviour {
     }
 
     // JointNum個のベクトルデータからParamを作成
-    private Learner.Param MakeParam(List<List<int>> lines)
+    private Learner.Param MakeParam(List<List<float>> lines)
     {
         Vector3[] vec = new Vector3[this.jointNum];
         for (int i = 0; i < this.jointNum; i++)
         {
-            vec[i] = IntToVec(lines[i]);
+            vec[i] = FloatToVec(lines[i]);
         }
         return Learner.Param.CreateParam(vec);
     }
 
-    private Vector3 IntToVec(List<int> i)
+    private Vector3 FloatToVec(List<float> i)
     {
         Vector3 vec = new Vector3(i[0], i[1], i[2]);
         //print(vec);
