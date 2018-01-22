@@ -140,6 +140,8 @@ public class GAController : MonoBehaviour {
             {
                 print("WriteLog");
                 this.writeLog(logDirPath, generation, geneList);
+                // BestGeneの内容を書き出す
+                this.writeLog(logDirPath + "/bestgenes",generation,this.bestGenes);
             }
 
 			var newGeneList = new List<Gene> ();
@@ -223,6 +225,39 @@ public class GAController : MonoBehaviour {
             }
             sr.Close();
         }
+    }
+    /// <summary>
+    /// BestGeneを読み込む
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="bestGenes">読み込み先のリスト</param>
+    /// <param name="num">読み込む遺伝子データの数</param>
+    private void LoadBestGenes(string path, ref List<Gene> bestGenes,int num)
+    {
+        using (StreamReader sr = new StreamReader(path))
+        {
+            string str = sr.ReadLine();
+            string[] g = str.Split(new char[2] { ' ', ',' });
+            this.generation = Int32.Parse(g[1]);
+
+            List<List<float>> data = new List<List<float>>();
+
+            CSVIO.LoadMap(ref data, sr.ReadToEnd(), this.ignoreItems);
+
+            int index = 0;
+            for (int i = 0; i < num; i++)
+            {
+                List<Learner.Param> paramList = new List<Learner.Param>();
+                for (int j = 0; j < stateNum; j++)
+                {
+                    paramList.Add(MakeParam(data.GetRange(index, jointNum)));
+                    index += jointNum;
+                }
+                geneList.Add(new Gene(paramList));
+            }
+            sr.Close();
+        }
+
     }
 
     // JointNum個のベクトルデータからParamを作成
